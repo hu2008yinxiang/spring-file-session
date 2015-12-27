@@ -38,7 +38,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         File file = new File(getStorageDirectory(), id);
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-            oos.writeObject(oos);
+            oos.writeObject(session);
             oos.flush();
             oos.close();
         } catch (IOException e) {
