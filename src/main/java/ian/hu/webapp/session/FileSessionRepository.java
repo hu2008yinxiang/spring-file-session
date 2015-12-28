@@ -9,7 +9,45 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
 
     private Integer defaultMaxInactiveInterval;
     private File storageDirectory;
+    private boolean cleanExpireOnStartup = false;
+    private boolean cleanIsDone = false;
+    private boolean cleanNotReadable = false;
 
+    /**
+     * Whether should clean up the storage directory when startup, this will delete the expired session files or unreadable files.
+     *
+     * @return boolean
+     */
+    public boolean isCleanExpireOnStartup() {
+        return cleanExpireOnStartup;
+    }
+
+    /**
+     * Whether should clean up the storage directory when startup, this will delete the expired session files or unreadable files.
+     *
+     * @param cleanExpireOnStartup true/false
+     */
+    public void setCleanExpireOnStartup(boolean cleanExpireOnStartup) {
+        this.cleanExpireOnStartup = cleanExpireOnStartup;
+    }
+
+    /**
+     * Whether should clean the unreadable files
+     *
+     * @return boolean
+     */
+    public boolean isCleanNotReadable() {
+        return cleanNotReadable;
+    }
+
+    /**
+     * hether should clean the unreadable files
+     *
+     * @param cleanNotReadable boolean
+     */
+    public void setCleanNotReadable(boolean cleanNotReadable) {
+        this.cleanNotReadable = cleanNotReadable;
+    }
 
     public void setDefaultMaxInactiveInterval(int defaultMaxInactiveInterval) {
         this.defaultMaxInactiveInterval = defaultMaxInactiveInterval;
@@ -23,13 +61,82 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         return result;
     }
 
+    /**
+     * set the storage path
+     *
+     * @param uri path
+     */
     public void setStorageDirectory(String uri) {
         File path = new File(uri);
         // directory exists
         if ((path.isDirectory() || path.mkdirs()) && path.canWrite()) {
             this.storageDirectory = path;
+            cleanIsDone = !cleanExpireOnStartup; // reset to do clean
         } else {
             throw new RuntimeException(new IOException(String.format("Path '%s' is not a directory or can't write.", path)));
+        }
+    }
+
+    /**
+     * get the storage path
+     *
+     * @return File
+     */
+    public File getStorageDirectory() {
+        if (storageDirectory == null) {
+            setStorageDirectory(System.getProperty("tmp.dir", "/tmp"));
+        }
+        if (!cleanIsDone && cleanExpireOnStartup) {
+            cleanIsDone = true;
+            doCleanExpired();
+        }
+        return storageDirectory;
+    }
+
+    /**
+     * Manually clean the expired
+     */
+    public void doCleanExpired() {
+        if (storageDirectory == null || !storageDirectory.canWrite()) {
+            throw new RuntimeException("storageDirectory should not be null and must be writable to clean.");
+        }
+        File[] files = storageDirectory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File f : files) {
+            if (!f.isFile() || !f.exists()) {
+                continue;
+            }
+            String id = f.getName();
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+                Object obj = ois.readObject();
+                ois.close();
+                // not readable
+                if (obj == null || !(obj instanceof MapSession)) {
+                    if (cleanNotReadable) {
+                        f.delete();
+                    }
+                    continue;
+                }
+                MapSession session = (MapSession) obj;
+                // expired
+                if (session.isExpired()) {
+                    f.delete();
+                    continue;
+                }
+            } catch (IOException e) {
+                // it's ok to fail
+                if (cleanNotReadable) {
+                    f.delete();
+                }
+            } catch (ClassNotFoundException e) {
+                // it's ok to fail
+                if (cleanNotReadable) {
+                    f.delete();
+                }
+            }
         }
     }
 
@@ -46,12 +153,6 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         }
     }
 
-    public File getStorageDirectory() {
-        if (storageDirectory == null) {
-            setStorageDirectory(System.getProperty("tmp.dir", "/tmp"));
-        }
-        return storageDirectory;
-    }
 
     public MapSession getSession(String id) {
         File file = new File(getStorageDirectory(), id);
