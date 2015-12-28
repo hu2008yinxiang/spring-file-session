@@ -71,7 +71,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         // directory exists
         if ((path.isDirectory() || path.mkdirs()) && path.canWrite()) {
             this.storageDirectory = path;
-            cleanIsDone = !cleanExpireOnStartup; // reset to do clean
+            cleanIsDone = false; // reset to do clean
         } else {
             throw new RuntimeException(new IOException(String.format("Path '%s' is not a directory or can't write.", path)));
         }
