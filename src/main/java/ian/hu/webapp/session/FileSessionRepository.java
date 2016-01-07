@@ -10,8 +10,8 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
     private Integer defaultMaxInactiveInterval;
     private File storageDirectory;
     private boolean cleanExpireOnStartup = false;
-    private boolean cleanIsDone = false;
     private boolean cleanNotReadable = false;
+    private long nextCleanup;
 
     /**
      * Whether should clean up the storage directory when startup, this will delete the expired session files or unreadable files.
@@ -71,7 +71,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         // directory exists
         if ((path.isDirectory() || path.mkdirs()) && path.canWrite()) {
             this.storageDirectory = path;
-            cleanIsDone = false; // reset to do clean
+            nextCleanup = System.currentTimeMillis(); // reset to do clean
         } else {
             throw new RuntimeException(new IOException(String.format("Path '%s' is not a directory or can't write.", path)));
         }
@@ -86,8 +86,8 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         if (storageDirectory == null) {
             setStorageDirectory(System.getProperty("tmp.dir", "/tmp"));
         }
-        if (!cleanIsDone && cleanExpireOnStartup) {
-            cleanIsDone = true;
+        if (nextCleanup < System.currentTimeMillis() && cleanExpireOnStartup) {
+            nextCleanup = System.currentTimeMillis() + (defaultMaxInactiveInterval == null ? 1800000 : defaultMaxInactiveInterval);
             doCleanExpired();
         }
         return storageDirectory;
