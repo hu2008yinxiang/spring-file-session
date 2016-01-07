@@ -6,7 +6,7 @@
 
     <groupId>ian.hu.webapp</groupId>
     <artifactId>spring-file-session</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
 
     <properties>
         <version.spring-session>1.0.2.RELEASE</version.spring-session>
