@@ -5,3 +5,5 @@ install: "mvn clean package"
 after_success:
 - mvn clean cobertura:cobertura coveralls:report
 - bash <(curl -s https://codecov.io/bash)
+
+# Make new release mvn -P release-to-oss clean deploy -DupdateReleaseInfo=true -DaltDeploymentRepository=oss::default::https://oss.sonatype.org/service/local/staging/deploy/maven2
