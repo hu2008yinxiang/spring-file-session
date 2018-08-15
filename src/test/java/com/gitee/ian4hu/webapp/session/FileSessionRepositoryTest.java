@@ -1,6 +1,7 @@
 package com.gitee.ian4hu.webapp.session;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,9 +30,8 @@ public class FileSessionRepositoryTest {
         repo.setCleanExpireOnStartup(true);
         repo.setCleanNotReadable(true);
         repo.setDefaultMaxInactiveInterval(1800);
-        repo.setStorageDirectory("/tmp/sess");
+        repo.setStorageDirectory(repo.getStorageDirectory().getAbsolutePath());
         repo.save(savedSession);
-        errorSessionFile.createNewFile();
         expiredSession.setLastAccessedTime(1);
         repo.save(expiredSession);
         repo.save(wrongSessionId);
@@ -68,7 +68,6 @@ public class FileSessionRepositoryTest {
     @After
     public void tearDown() throws Exception {
         repo.delete(savedSession.getId());
-        errorSessionFile.delete();
         wrongSessionIdFile.delete();
     }
 
@@ -84,8 +83,8 @@ public class FileSessionRepositoryTest {
     }
 
     @Test
-    public void getSessionNotRead() {
-        assertTrue(errorSessionFile.exists());
+    public void getSessionNotRead() throws IOException {
+        assertTrue(errorSessionFile.createNewFile());
         MapSession session = repo.getSession("error-session");
         assertNull(session);
         assertFalse(errorSessionFile.exists());
