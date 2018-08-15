@@ -86,7 +86,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
             this.storageDirectory = path;
             nextCleanup = System.currentTimeMillis(); // reset to do clean
         } else {
-            throw new RuntimeException(new IOException(String.format("Path '%s' is not a directory or can't write.", path)));
+            throw new IllegalArgumentException(String.format("Path '%s' is not a directory or can't write.", path));
         }
     }
 
@@ -138,7 +138,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
             oos.close();
         } catch (IOException e) {
             logger.error("Session file write failed @ " + file.getAbsolutePath(), e);
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Session read failed", e);
         }
     }
 
