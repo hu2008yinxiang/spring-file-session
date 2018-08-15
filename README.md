@@ -1,5 +1,5 @@
 # spring-file-session
-[![Maven Central](https://img.shields.io/maven-central/v/com.gitee.ian4hu/spring-file-session.svg)](https://search.maven.org/search?q=g:com.gitee.ian4hu%20a:spring-file-session)
+[![Maven Central](https://img.shields.io/maven-central/v/com.gitee.ian4hu/spring-file-session.svg)](https://search.maven.org/search?q=g:com.gitee.ian4hu%20AND%20a:spring-file-session)
 [![Build Status](https://travis-ci.org/ian4hu/spring-file-session.svg?branch=master)](https://travis-ci.org/ian4hu/spring-file-session)
 [![codecov](https://codecov.io/gh/ian4hu/spring-file-session/branch/master/graph/badge.svg)](https://codecov.io/gh/ian4hu/spring-file-session)
 [![Coverage Status](https://coveralls.io/repos/github/ian4hu/spring-file-session/badge.svg?branch=master)](https://coveralls.io/github/ian4hu/spring-file-session?branch=master)
