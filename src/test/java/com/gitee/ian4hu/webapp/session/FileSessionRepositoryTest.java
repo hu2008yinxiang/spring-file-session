@@ -26,6 +26,10 @@ public class FileSessionRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
+        repo.setCleanExpireOnStartup(true);
+        repo.setCleanNotReadable(true);
+        repo.setDefaultMaxInactiveInterval(1800);
+        repo.setStorageDirectory("/tmp/sess");
         repo.save(savedSession);
         errorSessionFile.createNewFile();
         expiredSession.setLastAccessedTime(1);
