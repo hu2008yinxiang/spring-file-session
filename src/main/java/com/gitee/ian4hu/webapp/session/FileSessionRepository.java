@@ -131,8 +131,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
     public void save(MapSession session) {
         String id = session.getId();
         File file = new File(getStorageDirectory(), id);
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(session);
             oos.flush();
             oos.close();
@@ -168,8 +167,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         }
 
         Object sessionObj = null;
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             sessionObj = ois.readObject();
             ois.close();
         } catch (IOException e) {

@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>spring-file-session</artifactId>
-	<version>1.5</version>
+	<version>1.6</version>
 	<description>A SpringSessionRepository implementation with file storage. PS: NOT FOR Production usage.</description>
 	<url>https://github.com/ian4hu/spring-file-session</url>
 
@@ -24,8 +24,10 @@
 
 	<properties>
 		<version.spring-session>RELEASE</version.spring-session>
-		<source>1.6</source>
-		<target>1.6</target>
+		<source>1.7</source>
+		<target>${source}</target>
+		<maven.compiler.source>${source}</maven.compiler.source>
+		<maven.compiler.target>${target}</maven.compiler.target>
 	</properties>
 
 	<dependencies>
