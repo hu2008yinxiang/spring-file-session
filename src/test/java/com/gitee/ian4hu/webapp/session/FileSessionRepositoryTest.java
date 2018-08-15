@@ -50,6 +50,7 @@ public class FileSessionRepositoryTest {
     public void save() {
         MapSession session = repo.createSession();
         repo.save(session);
+        assertEquals(session, repo.getSession(session.getId()));
     }
 
     @Test
@@ -63,6 +64,7 @@ public class FileSessionRepositoryTest {
         MapSession session = repo.createSession();
         repo.save(session);
         repo.delete(session.getId());
+        assertNull(repo.getSession(session.getId()));
     }
 
     @After
@@ -74,6 +76,7 @@ public class FileSessionRepositoryTest {
     @Test
     public void deleteNotExists() {
         repo.delete("not-exists");
+        assertNull(repo.getSession("not-exists"));
     }
 
     @Test
@@ -105,5 +108,7 @@ public class FileSessionRepositoryTest {
     @Test
     public void doClean() {
         repo.doCleanExpired();
+        assertNull(repo.getSession("error-session"));
+        assertNull(repo.getSession(expiredSession.getId()));
     }
 }
