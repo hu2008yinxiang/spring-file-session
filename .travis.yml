@@ -1,9 +1,16 @@
 language: java
 
+addons:
+  sonarcloud:
+    organization: "ian4hu-github" # the key of the org you chose at step #3
+    token:
+      secure: "Fnm6UByZ8XM06X3D278wgduusOlFHRqu/zDe0sre9+ynOD22K8WJsDkE2ZHmcuSaGOZOQbhlsT0czi0JqblQrjXw9pnLs23QMWxcQxrkiWpm8Ko6nFER1Lcf0Nx+S1IFdEe/9iK7z0Afppj3BlhZcvnobgg4jkU54Ut6JaEl86S7hEsEBt79LinEfpb72gNCXTCtHxnH+bL+p+Dvs1aal7GLTwojV8j4BPkqzsxStQpSi6pe58HRapxxcxYpErpKYdFY+XBJfoc7Wr+a1X6xpwZAI0AmgcQTlpyfhv9/DpPxejkx+baBQHgl5xNIs7qpQjw+Uy1cVHFpMPu/eZGqbsTM60k9G0XT4HYB5tWccCFon13upAnT+e/jBIi5qMn2qWjY027bSzr1WUxk5uSKE5SkT5av2VH1Zs25YtB6QkpCj/w7W+6p8hU9nI3LaLz6YAJmC8+04iZ1kxQjph6ZcVhd8LRPlSEPgK+ZKg5ZrQ8MDwFG57tZkXsdv6q+yzk8FZFZRjrb4Asfj2RbyT00zXnOxsAwvTLFK/tn3Gy0fy1BOnp6S9+Ku3CM4Mbf9+YvsZKdCYplJ9/ycbWl3or5+Az5191EDGh1SXiN7gTn5TVzRH9yOf5Y1RAqL/WSWQAKftZHAepR7KDYzF2vtD7EqAIsS/nCaJNicw1Os2EWYfw="
+
 install: "mvn clean package"
 
 after_success:
 - mvn clean cobertura:cobertura coveralls:report
 - bash <(curl -s https://codecov.io/bash)
+- mvn sonar:sonar
 
 # Make new release mvn -P release-to-oss clean deploy -DupdateReleaseInfo=true -DaltDeploymentRepository=oss::default::https://oss.sonatype.org/service/local/staging/deploy/maven2
