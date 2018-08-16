@@ -1,8 +1,8 @@
 language: java
 
 cache:
-  - $HOME/.m2
-  - $HOME/.sonar/cache
+- $HOME/.m2
+- $HOME/.sonar/cache
 
 
 addons:
@@ -17,12 +17,13 @@ before_install:
 - ./mvnw clean
 
 
+
 install: "./mvnw package"
 
 after_success:
 - ./mvnw cobertura:cobertura coveralls:report
 - bash <(curl -s https://codecov.io/bash)
-- ./mvnw test sonar:sonar
+- ./mvnw sonar:sonar
 - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/cobertura/coverage.xml
 
 # Make new release mvn -P release-to-oss clean deploy -DupdateReleaseInfo=true -DaltDeploymentRepository=oss::default::https://oss.sonatype.org/service/local/staging/deploy/maven2
