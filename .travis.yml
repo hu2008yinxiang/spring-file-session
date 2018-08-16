@@ -1,8 +1,9 @@
 language: java
 
 cache:
-- $HOME/.m2
-- $HOME/.sonar/cache
+  directories:
+  - $HOME/.m2
+  - $HOME/.sonar/cache
 
 
 addons:
