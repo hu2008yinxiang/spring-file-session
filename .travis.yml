@@ -21,10 +21,12 @@ before_install:
 
 install: "./mvnw package"
 
+before_cache:
+- ./mvnw cobertura:cobertura coveralls:report sonar:sonar
+
 after_success:
-- ./mvnw cobertura:cobertura coveralls:report
+#- ./mvnw cobertura:cobertura coveralls:report sonar:sonar
 - bash <(curl -s https://codecov.io/bash)
-- ./mvnw sonar:sonar
 - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/cobertura/coverage.xml
 
 # Make new release mvn -P release-to-oss clean deploy -DupdateReleaseInfo=true -DaltDeploymentRepository=oss::default::https://oss.sonatype.org/service/local/staging/deploy/maven2
