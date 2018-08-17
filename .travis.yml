@@ -21,7 +21,8 @@ before_install:
 
 
 
-install: "./mvnw package"
+script:
+  ./mvnw
 
 before_cache:
 - ./mvnw cobertura:cobertura coveralls:report sonar:sonar
