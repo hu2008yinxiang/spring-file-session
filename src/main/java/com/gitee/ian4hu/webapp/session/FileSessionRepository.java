@@ -134,7 +134,6 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(session);
             oos.flush();
-            oos.close();
         } catch (IOException e) {
             logger.error("Session file write failed @ " + file.getAbsolutePath(), e);
             throw new IllegalStateException("Session read failed", e);
@@ -169,7 +168,6 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         Object sessionObj = null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             sessionObj = ois.readObject();
-            ois.close();
         } catch (IOException e) {
             logger.warn("Session file @ " + file.getAbsolutePath() + " read failed.", e);
             // it's ok to fail
