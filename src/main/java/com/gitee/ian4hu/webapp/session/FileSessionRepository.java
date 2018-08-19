@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +23,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
 
     private File storageDirectory = new File(System.getProperty("tmp.dir", "/tmp"), "sess");
 
-    private boolean cleanExpireOnStartup = false;
+    private boolean cleanExpireOnStartup;
 
     private boolean cleanNotReadable = true;
 
@@ -67,9 +69,10 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         this.defaultMaxInactiveInterval = defaultMaxInactiveInterval;
     }
 
+    @Override
     public MapSession createSession() {
         MapSession result = new MapSession();
-        result.setMaxInactiveIntervalInSeconds(defaultMaxInactiveInterval);
+        result.setMaxInactiveInterval(Duration.ofSeconds(defaultMaxInactiveInterval));
         return result;
     }
 
@@ -83,7 +86,7 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         File path = new File(uri);
         // directory exists
         if ((path.isDirectory() || path.mkdirs()) && path.canWrite()) {
-            this.storageDirectory = path;
+            storageDirectory = path;
             nextCleanup = System.currentTimeMillis(); // reset to do clean
         } else {
             throw new IllegalArgumentException(String.format("Path '%s' is not a directory or can't write.", path));
@@ -116,18 +119,19 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
         if (files == null) {
             return;
         }
-        for (File f : files) {
-            if (!f.isFile() || !f.exists()) {
+        for (File file : files) {
+            if (!file.isFile() || !file.exists()) {
                 continue;
             }
 
-            String id = f.getName();
+            String id = file.getName();
 
             // Clean expire will occur after read
             readSessionFile(id);
         }
     }
 
+    @Override
     public void save(MapSession session) {
         String id = session.getId();
         File file = new File(getStorageDirectory(), id);
@@ -141,17 +145,19 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
     }
 
 
-    public MapSession getSession(String id) {
+    @Override
+    public MapSession findById(String id) {
         MapSession session = readSessionFile(id);
         if (session == null) {
             return null;
         }
         // Update last access time
-        session.setLastAccessedTime(System.currentTimeMillis());
+        session.setLastAccessedTime(Instant.now());
         return session;
     }
 
-    public void delete(String id) {
+    @Override
+    public void deleteById(String id) {
         File file = new File(getStorageDirectory(), id);
         if (file.exists() && !file.delete()) {
             logger.warn("Failed to delete session file @ " + file.getAbsolutePath() + ", session may not be deleted.");
@@ -172,32 +178,32 @@ public class FileSessionRepository implements SessionRepository<MapSession> {
             logger.warn("Session file @ " + file.getAbsolutePath() + " read failed.", e);
             // it's ok to fail
             if (isCleanNotReadable()) {
-                delete(id);
+                deleteById(id);
             }
         } catch (ClassNotFoundException e) {
             logger.warn("Session read failed @ " + file.getAbsolutePath(), e);
             // it's ok to fail
             if (isCleanNotReadable()) {
-                delete(id);
+                deleteById(id);
             }
         }
 
         if (!(sessionObj instanceof MapSession)) {
             // Meet data corruption
-            delete(id);
+            deleteById(id);
             return null;
         }
 
         MapSession session = (MapSession) sessionObj;
         // expired
         if (session.isExpired()) {
-            delete(id);
+            deleteById(id);
             return null;
         }
         if (!session.getId().equals(id)) {
             // Meet data corruption
             logger.warn("Session with wrong session id " + session.getId() + " @ " + file.getAbsolutePath());
-            delete(id);
+            deleteById(id);
             return null;
         }
         return session;

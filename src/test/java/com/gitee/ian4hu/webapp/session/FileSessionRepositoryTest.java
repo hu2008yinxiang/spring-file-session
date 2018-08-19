@@ -2,6 +2,7 @@ package com.gitee.ian4hu.webapp.session;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class FileSessionRepositoryTest {
         repo.setDefaultMaxInactiveInterval(1800);
         repo.setStorageDirectory(repo.getStorageDirectory().getAbsolutePath());
         repo.save(savedSession);
-        expiredSession.setLastAccessedTime(1);
+        expiredSession.setLastAccessedTime(Instant.ofEpochSecond(1));
         repo.save(expiredSession);
         repo.save(wrongSessionId);
         File file = new File(repo.getStorageDirectory(), wrongSessionId.getId());
@@ -50,12 +51,12 @@ public class FileSessionRepositoryTest {
     public void save() {
         MapSession session = repo.createSession();
         repo.save(session);
-        assertEquals(session, repo.getSession(session.getId()));
+        assertEquals(session, repo.findById(session.getId()));
     }
 
     @Test
     public void getSession() {
-        MapSession session = repo.getSession(savedSession.getId());
+        MapSession session = repo.findById(savedSession.getId());
         assertEquals(savedSession, session);
     }
 
@@ -63,52 +64,52 @@ public class FileSessionRepositoryTest {
     public void delete() {
         MapSession session = repo.createSession();
         repo.save(session);
-        repo.delete(session.getId());
-        assertNull(repo.getSession(session.getId()));
+        repo.deleteById(session.getId());
+        assertNull(repo.findById(session.getId()));
     }
 
     @After
-    public void tearDown() throws Exception {
-        repo.delete(savedSession.getId());
+    public void tearDown() {
+        repo.deleteById(savedSession.getId());
         wrongSessionIdFile.delete();
     }
 
     @Test
     public void deleteNotExists() {
-        repo.delete("not-exists");
-        assertNull(repo.getSession("not-exists"));
+        repo.deleteById("not-exists");
+        assertNull(repo.findById("not-exists"));
     }
 
     @Test
     public void getSessionNotExists() {
-        MapSession session = repo.getSession("not-exists");
+        MapSession session = repo.findById("not-exists");
         assertNull(session);
     }
 
     @Test
     public void getSessionNotRead() throws IOException {
         assertTrue(errorSessionFile.createNewFile());
-        MapSession session = repo.getSession("error-session");
+        MapSession session = repo.findById("error-session");
         assertNull(session);
         assertFalse(errorSessionFile.exists());
     }
 
     @Test
     public void getSessionExpired() {
-        MapSession session = repo.getSession(expiredSession.getId());
+        MapSession session = repo.findById(expiredSession.getId());
         assertNull(session);
     }
 
     @Test
     public void getSessionWrongSessionId() {
-        MapSession session = repo.getSession("wrong-session-id");
+        MapSession session = repo.findById("wrong-session-id");
         assertNull(session);
     }
 
     @Test
     public void doClean() {
         repo.doCleanExpired();
-        assertNull(repo.getSession("error-session"));
-        assertNull(repo.getSession(expiredSession.getId()));
+        assertNull(repo.findById("error-session"));
+        assertNull(repo.findById(expiredSession.getId()));
     }
 }
