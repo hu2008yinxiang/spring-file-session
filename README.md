@@ -17,6 +17,6 @@ An implement of SessionRepository using file storage. Ps: NOT for production.
 ## Note
 
  - [![spring-file-session 1.x](https://img.shields.io/maven-central/v/com.gitee.ian4hu/spring-file-session/1.svg?label=spring-file-session)](https://search.maven.org/search?q=g:com.gitee.ian4hu%20AND%20a:spring-file-session)
- for `Spring Session 1.x`
+ for [![Spring Session 1.x](https://img.shields.io/badge/Spring%20Session-1.x-blue.svg)](https://spring.io/projects/spring-session#learn)
  - [![spring-file-session 2.x](https://img.shields.io/maven-central/v/com.gitee.ian4hu/spring-file-session/2.svg?label=spring-file-session)](https://search.maven.org/search?q=g:com.gitee.ian4hu%20AND%20a:spring-file-session)
- for `Spring Session 2.x`
+ for [![Spring Session 1.x](https://img.shields.io/badge/Spring%20Session-2.x-blue.svg)](https://spring.io/projects/spring-session#learn)
