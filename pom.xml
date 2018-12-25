@@ -23,7 +23,7 @@
 
 
 	<properties>
-		<version.spring-session-core>2.0.5.RELEASE</version.spring-session-core>
+		<version.spring-session-core>2.1.2.RELEASE</version.spring-session-core>
 		<source>1.8</source>
 		<target>${source}</target>
 		<maven.compiler.source>${source}</maven.compiler.source>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>4.3.5.RELEASE</version>
+			<version>[4.3.18,)</version>
 			<optional>true</optional>
 		</dependency>
 
